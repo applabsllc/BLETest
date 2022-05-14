@@ -10,18 +10,20 @@
         <title>Bluetooth LE Test</title>
     </head>
     <body>
-		<div class="halfView" id="upperDiv">
-		
-		
+		<div class="halfView">
+		<h4>Devices:</h4>
+			<div class="middleAlign"  id="deviceList">
+				
+			</div>
 		</div>
 		<div class="halfView" id="lowerDiv">
 			<button class="niceButton">Reload BT Devices</button>
-			<button class="niceButton" onClick="share('Test string to share!','http://tpi.com')">Share</button>
+			<button class="niceButton" onClick="share('Testing share plugin!','http://tpi.com')">Share</button>
 			<hr>
 			<div id="notificationArea"></div>
 		</div>
     </body>
+	<script type="text/javascript" src="cordova.js"></script>
 	<script type="text/javascript" src="js/debug.js"></script>
-	<script src="cordova.js"></script>
-    <script src="js/index.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
 </html>

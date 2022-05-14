@@ -8,7 +8,7 @@ body {
     -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
     -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
     background-color:#E4E4E4;
-    background-image:linear-gradient(to bottom, #A7A7A7 0%, #E4E4E4 51%);
+    background-image:linear-gradient(to top, #A7A7A7 0%, #E4E4E4 65%);
     font-family: system-ui, -apple-system, -apple-system-font, 'Roboto', 'Segoe UI', sans-serif;
     font-size:12px;
     height:100vh;
@@ -32,4 +32,19 @@ body {
 	background: #cfcfd9;
 	border: 2px solid #dfdfdf;
 	font-size: 150%;
+	margin: 3px 0px;
+}
+
+.middleAlign{
+  margin-bottom: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.device{
+	display: inline-block;
+	border-radius: 8px;
+	background: #cfcfd9;
+	border: 2px solid #dfdfdf;
+	padding: 10px;
 }
