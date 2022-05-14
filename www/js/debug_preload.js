@@ -17,11 +17,11 @@ function logit(txt){
 
 var debughtmlpre='';
 
-			debughtmlpre+='<div style="display:none;visibility:hidden;">';
-			debughtmlpre+='<textarea style="width:95%;height:140px;" id="debugdiv_preload"></textarea>';
-			debughtmlpre+='	';
-			debughtmlpre+='</div>';
-			
-			if(true)
-			document.write(debughtmlpre);
+debughtmlpre+='<div style="display:none;visibility:hidden;">';
+debughtmlpre+='<textarea style="width:95%;height:140px;" id="debugdiv_preload"></textarea>';
+debughtmlpre+='	';
+debughtmlpre+='</div>';
+
+if(true)
+document.write(debughtmlpre);
 		
