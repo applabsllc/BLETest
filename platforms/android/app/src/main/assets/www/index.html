@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        <link rel="stylesheet" href="css/index.css">
+		<script type="text/javascript" src="js/debug_preload.js"></script>
+        <title>Bluetooth LE Test</title>
+    </head>
+    <body>
+		<div class="halfView">
+		<h4>Devices:</h4>
+			<div class="middleAlign"  id="deviceList">
+				
+			</div>
+		</div>
+		<div class="halfView" id="lowerDiv">
+			<button class="niceButton">Reload BT Devices</button>
+			<button class="niceButton" onClick="share('Testing share plugin!','http://tpi.com')">Share</button>
+			<hr>
+			<div id="notificationArea"></div>
+		</div>
+    </body>
+	<script type="text/javascript" src="cordova.js"></script>
+	<script type="text/javascript" src="js/debug.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+</html>

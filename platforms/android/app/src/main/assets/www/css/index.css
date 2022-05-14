@@ -1,0 +1,50 @@
+
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    background-color:#E4E4E4;
+    background-image:linear-gradient(to top, #A7A7A7 0%, #E4E4E4 65%);
+    font-family: system-ui, -apple-system, -apple-system-font, 'Roboto', 'Segoe UI', sans-serif;
+    font-size:12px;
+    height:100vh;
+    margin:0px;
+    padding:0px;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    text-transform:uppercase;
+    width:100%;
+}
+
+.halfView{
+	height: 50vh;
+	text-align: center;
+}
+
+.niceButton{
+	width: 90%;
+	box-sizing: border-box;
+	padding: 20px;
+	border-radius: 8px;
+	background: #cfcfd9;
+	border: 2px solid #dfdfdf;
+	font-size: 150%;
+	margin: 3px 0px;
+}
+
+.middleAlign{
+  margin-bottom: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.device{
+	display: inline-block;
+	border-radius: 8px;
+	background: #cfcfd9;
+	border: 2px solid #dfdfdf;
+	padding: 10px;
+}
