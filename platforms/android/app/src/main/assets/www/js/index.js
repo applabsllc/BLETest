@@ -1,11 +1,14 @@
 
 
+
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady(){
-
+	
     logit('Running cordova-' + cordova.platformId + '@' + cordova.version);
-   
+    window.bluetoothle.initialize(() => {}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
+    window.bluetoothle.enable(() => logit("ble enabled!"), () => logit("ble disabled"));
+	
 }
 
 function share(data, url){
@@ -23,24 +26,30 @@ function share(data, url){
 	};
 
 	const onError = function(msg) {
-	  console.log("Share failed: " + msg);
+	  logit("Share failed: " + msg);
 	};
 	
-	logit(window.plugins);
+	//logit(window.plugins);
 	window.plugins && window.plugins.socialsharing ? window.plugins.socialsharing.shareWithOptions(options, onSuccess, onError) : onError("no plugin");
 		
+}
+
+function notice(){
+logit("= Scanning...");	
+setTimeout(notice,5500);
 }
 
 function scanBle(){
 	
 	let deviceList = [];
 	
-	if(!ble){
-		logit("ble undefined, loading w.p. ...");
-		ble = windows.plugins.ble;
+	logit("starting scan...");
+	
+	if(typeof ble === "undefined"){
+		ble = window.bluetoothle;
 	}
 	
-	if(!ble)logit("ble still undefined :( ");
+	if(!ble)logit("ble plugin not loaded or allowed.");
 	
 	const ble_success = () => {
 		
@@ -48,22 +57,25 @@ function scanBle(){
 		
 		//fetch list of devices
 		//ble.scan(services, seconds, success, failure);
-		
-		ble.startScan([], (device) => {
+		notice();
+		ble.startScan( (device) => {
+			logit("found device:");
 			logit(device);
-			deviceList.push(device);
-			redrawList(deviceList);
-		}, () => ble_failure());
+			if(device.status != "scanStarted"){
+				deviceList.push(device);
+				redrawList(deviceList);
+			}
+			
+		}, (str) => ble_failure(str),{CALLBACK_TYPE_ALL_MATCHES : 1} );
+		
 		
 	}
 	
-	const ble_failure = () => {
-		//display ble not active
-		logit("BT not enabled");
-		display_ble("Bluetooth not enabled.");
+	const ble_failure = (str) => {
+		logit(str);
+		displayBle("Bluetooth not enabled.");
 	}
 	
-	logit("begin ble...");
 	ble.isEnabled(ble_success, ble_failure);
 	
 }
@@ -80,13 +92,19 @@ function redrawList(deviceList){
 }
 
 function displayBle(str){
-	
+	//logit(str);
 	document.getElementById("deviceList").innerHTML = str;
 	
 }
 
 function drawDevice(obj){
+	logit(obj);
+	return `<div class='device' onClick='pairDevice("`+obj.name+`")'>`+obj.name+`</div>`;
 	
-	return `<div class='device' onClick='pairDevice()'>dev</div>`;
+}
+
+function pairDevice(id){
+	
+logit("try to pair w "+id+" ....");	
 	
 }

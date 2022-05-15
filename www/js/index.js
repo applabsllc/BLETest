@@ -1,11 +1,14 @@
 
 
+
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady(){
-
+	
     logit('Running cordova-' + cordova.platformId + '@' + cordova.version);
-   
+    bluetoothle.initialize(() => {}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
+    bluetoothle.enable(() => logit("ble enabled!"), () => logit("ble disabled"));
+	
 }
 
 function share(data, url){
@@ -23,48 +26,49 @@ function share(data, url){
 	};
 
 	const onError = function(msg) {
-	  console.log("Share failed: " + msg);
+	  logit("Share failed: " + msg);
 	};
 	
-	logit(window.plugins);
 	window.plugins && window.plugins.socialsharing ? window.plugins.socialsharing.shareWithOptions(options, onSuccess, onError) : onError("no plugin");
 		
+}
+
+function notice(){
+logit("= Scanning...");	
+setTimeout(notice,5500);
 }
 
 function scanBle(){
 	
 	let deviceList = [];
 	
-	if(!ble){
-		logit("ble undefined, loading w.p. ...");
-		ble = windows.plugins.ble;
-	}
-	
-	if(!ble)logit("ble still undefined :( ");
+	logit("starting scan...");
+
+	if(typeof bluetoothle === "undefined")displayBle("Plugin not loaded or allowed");
 	
 	const ble_success = () => {
 		
 		logit("BT enabled, scanning...");
 		
-		//fetch list of devices
-		//ble.scan(services, seconds, success, failure);
-		
-		ble.startScan([], (device) => {
+		notice();
+		bluetoothle.startScan( (device) => {
+			logit("found device:");
 			logit(device);
-			deviceList.push(device);
-			redrawList(deviceList);
-		}, () => ble_failure());
+			if(device.status != "scanStarted"){
+				deviceList.push(device);
+				redrawList(deviceList);
+			}
+			
+		}, (err) => ble_failure(err.message),{ "callbackType": bluetoothle.CALLBACK_TYPE_ALL_MATCHES , services : [] } );
+		
 		
 	}
 	
-	const ble_failure = () => {
-		//display ble not active
-		logit("BT not enabled");
-		display_ble("Bluetooth not enabled.");
+	const ble_failure = (str = null) => {
+		displayBle(str?str:"Bluetooth not enabled.");
 	}
 	
-	logit("begin ble...");
-	ble.isEnabled(ble_success, ble_failure);
+	bluetoothle.isEnabled(ble_success, ble_failure);
 	
 }
 
@@ -80,13 +84,28 @@ function redrawList(deviceList){
 }
 
 function displayBle(str){
-	
 	document.getElementById("deviceList").innerHTML = str;
-	
 }
 
 function drawDevice(obj){
+	logit(obj);
+	return `<div class='device' onClick='pairDevice("`+obj.address+`")'>`+obj.name+`</div>`;
+}
+
+function pairDevice(addr){
 	
-	return `<div class='device' onClick='pairDevice()'>dev</div>`;
+logit("try to pair w "+addr+" ....");	
+
+	bluetoothle.bond((resp) => {
+		if(resp.status == "bonded"){
+			logit("paired with "+addr);
+			bluetoothle.services((serviceObj) => {
+				//subscribe to all services
+				deviceObj.services.map((service) => {
+					
+				});
+			}, () => logit("Error on discovery"), { "address": addr, "clearCache": true });
+		}
+	}, (err) => ble_failure(err.message), { "address" : addr } );
 	
 }
