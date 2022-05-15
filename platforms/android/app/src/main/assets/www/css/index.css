@@ -20,12 +20,12 @@ body {
 }
 
 .topView{
-	height: 30vh;
+	height: 50vh;
 	text-align: center;
 }
 
 .bottomView{
-	height: 70vh;
+	height: 50vh;
 	text-align: center;
 }
 
@@ -44,12 +44,14 @@ body {
   margin-bottom: 10px;
   padding: 10px;
   box-sizing: border-box;
+  text-align: center;
 }
 
 .device{
 	display: inline-block;
 	border-radius: 8px;
-	background: #cfcfd9;
+	background: #cfd5d9;
 	border: 2px solid #dfdfdf;
-	padding: 10px;
+	padding: 10px 20px;
+	margin: 3px;
 }

@@ -36,7 +36,6 @@ function actAsPeripheral(){//unused function
 	
 	let deviceList = [];
 	
-	
 	logit("starting scan...");
 
 	if(typeof bluetoothle === "undefined"){
@@ -70,9 +69,14 @@ function actAsPeripheral(){//unused function
 		};
 
 	bluetoothle.initializePeripheral(() => {}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleperipheraltest" });
-    bluetoothle.enable(() => logit("blep enabled!"), (err) => logit("blep disabled:"+err.message));
-	bluetoothle.addService(() => {}, () => logit("error on creating service"), serviceParams);
-	bluetoothle.startAdvertising(() => {}, () => logit("error on advertising service"), advertParams);
+    bluetoothle.enable(() => {
+		//create service
+		bluetoothle.addService(() => {}, () => logit("error on creating service"), serviceParams);
+		//create advert
+		bluetoothle.startAdvertising(() => {}, () => logit("error on advertising service"), advertParams);
+	}
+	, (err) => logit("bleP disabled:"+err.message));
+	
 }
 
 function scanBle(){
@@ -87,18 +91,13 @@ function scanBle(){
 		return;
 	}
 	
-	bluetoothle.initialize(() => {}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
-    bluetoothle.enable(() => logit("ble enabled!"), (err) => logit("ble disabled: "+err.message));
-	bluetoothle.requestPermission(() => {}, () => logit("no coarse location permission"));
-	
 	const ble_success = () => {
 		
 		logit("BT enabled, scanning...");
 		
 		bluetoothle.startScan( (device) => {
 			
-			
-			if(device.status == "scanResult"){
+			if(device.status != "scanStarted"){
 				if(!deviceList.find(item => item.address === device.address)){
 					logit("found device! :");
 					logit(device);
@@ -107,16 +106,21 @@ function scanBle(){
 				}
 			}
 			
-		}, (err) => ble_failure(err.message),{ "callbackType": bluetoothle.CALLBACK_TYPE_ALL_MATCHES , services : [] } );
+		}, (err) => logit(err.message),{ "callbackType": bluetoothle.CALLBACK_TYPE_ALL_MATCHES , services : [] } );
 		
 		
 	}
 	
 	const ble_failure = (str = null) => {
-		displayBle(str?str:"Bluetooth not enabled.");
+		displayBle(str?str:"BT Disabled or Unallowed");
 	}
 	
-	bluetoothle.isEnabled(ble_success, ble_failure);
+	bluetoothle.initialize(() => {
+		bluetoothle.requestPermission(() => {
+			bluetoothle.enable(() => ble_success(), () => ble_success());//both functions are same since error can ocurr if already enabled
+		}, () => logit("no coarse location permission"));	
+	}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
+    
 	
 }
 
@@ -136,7 +140,6 @@ function displayBle(str){
 }
 
 function drawDevice(obj){
-	logit(obj);
 	return `<div class='device' onClick='pairDevice("`+obj.address+`")'>`+(obj.name? obj.name: obj.address)+`</div>`;
 }
 
@@ -145,6 +148,7 @@ function pairDevice(addr){
 logit("try to pair w "+addr+" ....");	
 
 	bluetoothle.connect((resp) => {
+		logit(resp);
 			if(resp.status == "connected"){
 				logit("paired with "+resp.name);
 				//discover all services
