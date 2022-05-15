@@ -19,8 +19,13 @@ body {
     width:100%;
 }
 
-.halfView{
-	height: 50vh;
+.topView{
+	height: 30vh;
+	text-align: center;
+}
+
+.bottomView{
+	height: 70vh;
 	text-align: center;
 }
 

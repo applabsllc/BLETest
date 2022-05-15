@@ -6,9 +6,7 @@ document.addEventListener('deviceready', onDeviceReady, false);
 function onDeviceReady(){
 	
     logit('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    window.bluetoothle.initialize(() => {}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
-    window.bluetoothle.enable(() => logit("ble enabled!"), () => logit("ble disabled"));
-	
+   
 }
 
 function share(data, url){
@@ -29,54 +27,95 @@ function share(data, url){
 	  logit("Share failed: " + msg);
 	};
 	
-	//logit(window.plugins);
 	window.plugins && window.plugins.socialsharing ? window.plugins.socialsharing.shareWithOptions(options, onSuccess, onError) : onError("no plugin");
 		
 }
 
-function notice(){
-logit("= Scanning...");	
-setTimeout(notice,5500);
+
+function actAsPeripheral(){//unused function
+	
+	let deviceList = [];
+	
+	
+	logit("starting scan...");
+
+	if(typeof bluetoothle === "undefined"){
+		displayBle("Plugin not loaded");
+		return;
+	}
+	
+	const serviceParams = {
+		  service: "1234",
+		  characteristics: [
+			{
+			  uuid: "ABCD",
+			  permissions: {
+				read: true,
+				write: true,
+			  },
+			  properties : {
+				read: true,
+				writeWithoutResponse: true,
+				write: true,
+				notify: true,
+				indicate: true,
+			  }
+			}
+		  ]
+		};
+	
+	const advertParams = {
+		  "service":"1234", 
+		  "name":"Hi-Im A Peripheral",
+		};
+
+	bluetoothle.initializePeripheral(() => {}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleperipheraltest" });
+    bluetoothle.enable(() => logit("blep enabled!"), (err) => logit("blep disabled:"+err.message));
+	bluetoothle.addService(() => {}, () => logit("error on creating service"), serviceParams);
+	bluetoothle.startAdvertising(() => {}, () => logit("error on advertising service"), advertParams);
 }
 
 function scanBle(){
 	
 	let deviceList = [];
 	
-	logit("starting scan...");
 	
-	if(typeof ble === "undefined"){
-		ble = window.bluetoothle;
+	logit("starting scan...");
+
+	if(typeof bluetoothle === "undefined"){
+		displayBle("Plugin not loaded");
+		return;
 	}
 	
-	if(!ble)logit("ble plugin not loaded or allowed.");
+	bluetoothle.initialize(() => {}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
+    bluetoothle.enable(() => logit("ble enabled!"), (err) => logit("ble disabled: "+err.message));
+	bluetoothle.requestPermission(() => {}, () => logit("no coarse location permission"));
 	
 	const ble_success = () => {
 		
 		logit("BT enabled, scanning...");
 		
-		//fetch list of devices
-		//ble.scan(services, seconds, success, failure);
-		notice();
-		ble.startScan( (device) => {
-			logit("found device:");
+		bluetoothle.startScan( (device) => {
+			
 			logit(device);
-			if(device.status != "scanStarted"){
-				deviceList.push(device);
-				redrawList(deviceList);
+			if(device.status == "scanResult"){
+				logit("found device!");
+				if(!deviceList.find(item => item.address === device.address)){
+					deviceList.push(device);
+					redrawList(deviceList);
+				}
 			}
 			
-		}, (str) => ble_failure(str),{CALLBACK_TYPE_ALL_MATCHES : 1} );
+		}, (err) => ble_failure(err.message),{ "callbackType": bluetoothle.CALLBACK_TYPE_ALL_MATCHES , services : [] } );
 		
 		
 	}
 	
-	const ble_failure = (str) => {
-		logit(str);
-		displayBle("Bluetooth not enabled.");
+	const ble_failure = (str = null) => {
+		displayBle(str?str:"Bluetooth not enabled.");
 	}
 	
-	ble.isEnabled(ble_success, ble_failure);
+	bluetoothle.isEnabled(ble_success, ble_failure);
 	
 }
 
@@ -92,19 +131,44 @@ function redrawList(deviceList){
 }
 
 function displayBle(str){
-	//logit(str);
 	document.getElementById("deviceList").innerHTML = str;
-	
 }
 
 function drawDevice(obj){
 	logit(obj);
-	return `<div class='device' onClick='pairDevice("`+obj.name+`")'>`+obj.name+`</div>`;
-	
+	return `<div class='device' onClick='pairDevice("`+obj.address+`")'>`+obj.name+`</div>`;
 }
 
-function pairDevice(id){
+function pairDevice(addr){
 	
-logit("try to pair w "+id+" ....");	
+logit("try to pair w "+addr+" ....");	
+
+	bluetoothle.connect((resp) => {
+			if(resp.status == "connected"){
+				logit("paired with "+resp.name);
+				//discover all services
+				bluetoothle.discover((discovery) => {
+					if(discovery.status == "discovered"){
+					//read all services possible
+						discovery.services.map((service) => {
+							service.characteristics.map((serviceChar) => {
+								if(serviceChar.properties.read)//if it can be read then read
+								bluetoothle.read((data) => {
+									//show result of data recieved
+									logit("Data recieved: " + data.value);
+								}, 
+								(err) => ble_failure("Error on read: "+err.message), 
+								{"address": addr , "service": service.uuid ,"characteristic": serviceChar.uuid });
+							});
+						});
+					}
+				}, 
+				(err) => ble_failure("Error on discovery of services: "+ err.message), 
+				{ "address": addr, "clearCache": true });
+			}
+		}, 
+		(err) => ble_failure("Error on connect: "+err.message), 
+		{ "address" : addr } 
+	);
 	
 }
