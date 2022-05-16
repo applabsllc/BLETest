@@ -86,10 +86,9 @@ function actAsPeripheral(){//unused function
 	
 }
 
-function scanBle(){
+function scanBle(){//begin scan
 	
 	let deviceList = [];
-	
 	
 	logit("starting scan...");
 
@@ -102,13 +101,15 @@ function scanBle(){
 		
 		logit("BT enabled, scanning...");
 		
-		bluetoothle.startScan( (device) => {
+		bluetoothle.startScan( (device) => {//scan for all devices nearby
 			
 			if(device.status != "scanStarted"){
 				if(!deviceList.find(item => item.address === device.address)){
 					logit("found device! :");
 					logit(device);
+					//add device to array of devices
 					deviceList.push(device);
+					//redraw devices
 					redrawList(deviceList);
 				}
 			}
