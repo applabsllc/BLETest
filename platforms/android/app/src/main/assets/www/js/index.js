@@ -6,7 +6,13 @@ document.addEventListener('deviceready', onDeviceReady, false);
 function onDeviceReady(){
 	
     logit('Running cordova-' + cordova.platformId + '@' + cordova.version);
-   
+	//initialize ble and request permissions
+	bluetoothle.initialize(() => {
+		bluetoothle.requestPermission(() => {
+			bluetoothle.enable(() => {}, () => {});
+		}, () => logit("no coarse location permission"));	
+	}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
+    
 }
 
 function share(data, url){
@@ -115,13 +121,8 @@ function scanBle(){
 		displayBle(str?str:"BT Disabled or Unallowed");
 	}
 	
-	bluetoothle.initialize(() => {
-		bluetoothle.requestPermission(() => {
-			bluetoothle.enable(() => ble_success(), () => ble_success());//both functions are same since error can ocurr if already enabled
-		}, () => logit("no coarse location permission"));	
-	}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
-    
 	
+	bluetoothle.isEnabled(ble_success, ble_failure);
 }
 
 function redrawList(deviceList){
@@ -140,10 +141,7 @@ function displayBle(str){
 }
 
 function drawDevice(obj){
-	
-	var name2 = bluetoothle.bytesToString(bluetoothle.encodedStringToBytes(obj.advertisement));
-	
-	return `<div class='device' onClick='pairDevice("`+obj.address+`")'>`+(obj.name? obj.name: name2)+`</div>`;
+	return `<div class='device' onClick='pairDevice("`+obj.address+`")'>`+(obj.name? obj.name: obj.address)+`</div>`;
 }
 
 function pairDevice(addr){

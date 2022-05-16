@@ -6,7 +6,14 @@ document.addEventListener('deviceready', onDeviceReady, false);
 function onDeviceReady(){
 	
     logit('Running cordova-' + cordova.platformId + '@' + cordova.version);
-   
+	
+	//initialize ble and request permissions
+	bluetoothle.initialize(() => {//initialize
+		bluetoothle.requestPermission(() => {//request location permission
+			bluetoothle.enable(() => {}, () => {});//enable bluetooth
+		}, () => logit("no location permission"));	
+	}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
+    
 }
 
 function share(data, url){
@@ -115,13 +122,8 @@ function scanBle(){
 		displayBle(str?str:"BT Disabled or Unallowed");
 	}
 	
-	bluetoothle.initialize(() => {
-		bluetoothle.requestPermission(() => {
-			bluetoothle.enable(() => ble_success(), () => ble_success());//both functions are same since error can ocurr if already enabled
-		}, () => logit("no coarse location permission"));	
-	}, {"request": true, "statusReceiver": false, "restoreKey" : "bluetoothleplugintest" });
-    
 	
+	bluetoothle.isEnabled(ble_success, ble_failure);
 }
 
 function redrawList(deviceList){
