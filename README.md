@@ -17,9 +17,9 @@ Install the APK on your device and press 'Begin Device Scan' to begin scanning f
 To pair to a device and receive data, press a discovered device from the list of available devices.
 
 
-![Screnshot 1](https://github.com/applabsllc/bletest/blob/main/screnshots/image1.jpg?raw=true)
+![Screnshot 1](https://github.com/applabsllc/BLETest/blob/main/screnshots/image1.jpg?raw=true)
 
-![Screnshot 2](https://github.com/applabsllc/bletest/blob/main/screnshots/image2.jpg?raw=true)
+![Screnshot 2](https://github.com/applabsllc/BLETest/blob/main/screnshots/image2.jpg?raw=true)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
